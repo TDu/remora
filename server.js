@@ -1,6 +1,8 @@
 #!/bin/env node
 //  OpenShift sample Node application
 var express = require('express');
+var request = require('request');
+var rss = require('./rssmaker');
 var fs      = require('fs');
 
 
@@ -95,6 +97,19 @@ var SampleApp = function() {
     self.createRoutes = function() {
         self.routes = { };
 
+        self.routes['/rss'] = function(req, res) {
+            var url ='http://www.beachgrit.com';
+            request(url, function(error, response, html){
+                if(!error) {
+                    result = rss(html);
+                    res.send(result);
+
+                } else {
+                    res.send('Oops something went wrong : ' + error);
+                }
+    });
+            };
+
         self.routes['/asciimo'] = function(req, res) {
             var link = "http://i.imgur.com/kmbjB.png";
             res.send("<html><body><img src='" + link + "'></body></html>");
@@ -156,4 +171,3 @@ var SampleApp = function() {
 var zapp = new SampleApp();
 zapp.initialize();
 zapp.start();
-
