@@ -2,7 +2,7 @@
 //  OpenShift sample Node application
 var express = require('express');
 var request = require('request');
-//var rss = require('./rssmaker');
+var rss = require('./rssmaker');
 var fs      = require('fs');
 
 
