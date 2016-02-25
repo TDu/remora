@@ -108,7 +108,7 @@ var SampleApp = function() {
                 //} else {
                     //res.send('Oops something went wrong : ' + error);
                 //}
-    });
+    //});
             };
 
         self.routes['/asciimo'] = function(req, res) {
