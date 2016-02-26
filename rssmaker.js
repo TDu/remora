@@ -18,18 +18,23 @@ var createFeed = function createFeed (html, url ) {
     });
 
     //Get the feed entries
-//    $('#ajax-filtered-section').filter(function () {
-//        $(this).find('article').each(function (index, value){
-//            var title,
-//            url,
-//            description;
-//            title = $(this).find('h3').text();
-//            url = $(this).find('a').attr('href');
-//            description = $(this).find('p').text();
-//            feed.addNewItem(title, url, new Date(), description, {});
-//
-//        });
-//    });
+    $('#ajax-filtered-section').filter(function () {
+        $(this).find('article').each(function (index, value){
+            var title,
+            url,
+            description;
+            title = $(this).find('h3').text();
+            url = $(this).find('a').attr('href');
+            description = $(this).find('p').text();
+            feed.item({
+                title: title,
+                url: url,
+                //new Date(),
+                description: description
+            });
+
+        });
+    });
     var xmlString = feed.xml();//rss.getFeedXML(feed);
     return xmlString;
 };

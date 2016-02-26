@@ -99,17 +99,17 @@ var SampleApp = function() {
 
         self.routes['/rss'] = function(req, res) {
             var url ='http://www.beachgrit.com';
-            res.send('<html>v for ...</html>');
-            //request(url, function(error, response, html){
-                //if(!error) {
-                    //result = rss(html);
-                    //res.send(result);
+            //res.send('<html>v for ...</html>');
+            request(url, function(error, response, html){
+                if(!error) {
+                    result = rss(html);
+                    res.send(result);
 
-                //} else {
-                    //res.send('Oops something went wrong : ' + error);
-                //}
-    //});
-            };
+                } else {
+                    res.send('Oops something went wrong : ' + error);
+                }
+            });
+        };
 
         self.routes['/asciimo'] = function(req, res) {
             var link = "http://i.imgur.com/kmbjB.png";
