@@ -14,6 +14,8 @@ var SampleApp = function() {
     //  Scope.
     var self = this;
 
+    self.feedLoadInterval = 600000; //10 minutes
+
 
     /*  ================================================================  */
     /*  Helper functions.                                                 */
@@ -35,6 +37,12 @@ var SampleApp = function() {
         };
     };
 
+    // Feed parameters to synch
+    self.feed_param = {
+        title: 'Beachgrit unofficial feed',
+        site_url: 'http://www.beachgrit.com',
+        image_url: 'http://beachgrit.com/wp-content/uploads/2015/06/favicon.png'
+    }
 
     /**
      *  Populate the cache.
@@ -55,6 +63,9 @@ var SampleApp = function() {
      */
     self.cache_get = function(key) { return self.zcache[key]; };
 
+    self.cache_set = function(key, value) {
+        self.zcache[key] = value;
+    }
 
     /**
      *  terminator === the termination handler
@@ -98,17 +109,16 @@ var SampleApp = function() {
         self.routes = { };
 
         self.routes['/rss'] = function(req, res) {
-            var url ='http://www.beachgrit.com';
-            //res.send('<html>v for ...</html>');
-            request(url, function(error, response, html){
-                if(!error) {
-                    result = rss(html);
-                    res.send(result);
-
-                } else {
-                    res.send('Oops something went wrong : ' + error);
-                }
-            });
+            res.send(self.cache_get('beachgrit'));
+//            request(self.feed_param.site_url, function(error, response, html){
+//                if(!error) {
+//                    result = rss(html);
+//                    res.send(result);
+//
+//                } else {
+//                    res.send('Oops something went wrong : ' + error);
+//                }
+           // });
         };
 
         self.routes['/asciimo'] = function(req, res) {
@@ -137,6 +147,20 @@ var SampleApp = function() {
         }
     };
 
+    self.loadFeed = function () {
+        console.log('beep');
+        request(self.feed_param.site_url, function(error, response, html){
+            if(!error) {
+                result = rss(html);
+                self.cache_set('beachgrit', result);
+                //res.send(result);
+
+            } else {
+                self.cache_set('beachgrit', 'Ooops something went wrong : ' + error);
+            }
+        });
+    }
+
 
     /**
      *  Initializes the sample application.
@@ -156,6 +180,8 @@ var SampleApp = function() {
      */
     self.start = function() {
         //  Start the app on the specific interface (and port).
+        self.loadFeed();
+        setInterval(self.loadFeed, 600000);
         self.app.listen(self.port, self.ipaddress, function() {
             console.log('%s: Node server started on %s:%d ...',
                         Date(Date.now() ), self.ipaddress, self.port);
