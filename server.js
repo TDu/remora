@@ -1,29 +1,17 @@
 #!/bin/env node
-//  OpenShift sample Node application
+//
 var express = require('express');
 var request = require('request');
 var rss = require('./rssmaker');
 var fs      = require('fs');
 
-
-/**
- *  Define the sample application.
- */
 var SampleApp = function() {
 
-    //  Scope.
     var self = this;
 
     self.feedLoadInterval = 600000; //10 minutes
 
-
-    /*  ================================================================  */
-    /*  Helper functions.                                                 */
-    /*  ================================================================  */
-
-    /**
-     *  Set up server IP address and port # using env variables/defaults.
-     */
+    // Set up server IP address and port # using env variables/defaults.
     self.setupVariables = function() {
         //  Set the environment variables we need.
         self.ipaddress = process.env.OPENSHIFT_NODEJS_IP;
@@ -38,27 +26,44 @@ var SampleApp = function() {
     };
 
     // Feed parameters to synch
-    self.feed_param = {
-        title: 'Beachgrit unofficial feed',
-        site_url: 'http://www.beachgrit.com',
-        image_url: 'http://beachgrit.com/wp-content/uploads/2015/06/favicon.png'
-    }
+    self.feed_param = {};
+    self.feed_param['beachgrit'] = {
+        rssmaker: {
+            argument_items_section: '#ajax-filtered-section',
+            argument_item: 'article',
+            argument_item_title: 'h3',
+            argument_item_description: 'p'
+        },
+        rssfeed: {
+            title: 'Beachgrit unofficial feed',
+            site_url: 'http://www.beachgrit.com',
+            image_url: 'http://beachgrit.com/wp-content/uploads/2015/06/favicon.png'
+        }
+    };
+    self.feed_param['wsl'] = {
+        rssmaker: {
+            argument_items_section: '.hub-layout',
+            argument_item: '.y-u-1-3',
+            argument_item_title: '.content-item-title',
+            argument_item_description: '.content-item-description'
+        },
+        rssfeed: {
+            title: 'World surf league unofficial feed',
+            site_url: 'http://www.wsl.com',
+            //image_url: 'http://beachgrit.com/wp-content/uploads/2015/06/favicon.png'
+        }
+    };
 
-    /**
-     *  Populate the cache.
-     */
+    // Populate the cache.
     self.populateCache = function() {
         if (typeof self.zcache === "undefined") {
             self.zcache = { 'index.html': '' };
         }
-
         //  Local cache for static content.
         self.zcache['index.html'] = fs.readFileSync('./index.html');
     };
 
-
-    /**
-     *  Retrieve entry (content) from cache.
+     /* Retrieve entry (content) from cache.
      *  @param {string} key  Key identifying content to retrieve from cache.
      */
     self.cache_get = function(key) { return self.zcache[key]; };
@@ -108,22 +113,12 @@ var SampleApp = function() {
     self.createRoutes = function() {
         self.routes = { };
 
-        self.routes['/rss'] = function(req, res) {
+        self.routes['/rss/beachgrit'] = function(req, res) {
             res.send(self.cache_get('beachgrit'));
-//            request(self.feed_param.site_url, function(error, response, html){
-//                if(!error) {
-//                    result = rss(html);
-//                    res.send(result);
-//
-//                } else {
-//                    res.send('Oops something went wrong : ' + error);
-//                }
-           // });
         };
 
-        self.routes['/asciimo'] = function(req, res) {
-            var link = "http://i.imgur.com/kmbjB.png";
-            res.send("<html><body><img src='" + link + "'></body></html>");
+        self.routes['/rss/wsl'] = function(req, res) {
+            res.send(self.cache_get('wsl'));
         };
 
         self.routes['/'] = function(req, res) {
@@ -149,16 +144,20 @@ var SampleApp = function() {
 
     self.loadFeed = function () {
         console.log('beep');
-        request(self.feed_param.site_url, function(error, response, html){
-            if(!error) {
-                result = rss(html);
-                self.cache_set('beachgrit', result);
-                //res.send(result);
-
-            } else {
-                self.cache_set('beachgrit', 'Ooops something went wrong : ' + error);
-            }
-        });
+        for (var feedname in self.feed_param) {
+            (function (feedname){
+                console.log('loading ' + feedname)
+                request(self.feed_param[feedname].rssfeed.site_url, function(error, response, html){
+                    if(!error) {
+                        result = rss(html, self.feed_param[feedname].rssfeed, self.feed_param[feedname].rssmaker);
+                        self.cache_set(feedname, result);
+                    } else {
+                        self.cache_set('feedname', 'Ooops something went wrong : ' + error);
+                    }
+            });
+            
+            })(feedname);
+        };
     }
 
 
