@@ -43,13 +43,13 @@ var SampleApp = function() {
     self.feed_param['wsl'] = {
         rssmaker: {
             argument_items_section: '.hub-layout',
-            argument_item: '.y-u-1-3',
+            argument_item: '.content-item',
             argument_item_title: '.content-item-title',
             argument_item_description: '.content-item-description'
         },
         rssfeed: {
             title: 'World surf league unofficial feed',
-            site_url: 'http://www.wsl.com',
+            site_url: 'http://www.worldsurfleague.com',
             //image_url: 'http://beachgrit.com/wp-content/uploads/2015/06/favicon.png'
         }
     };

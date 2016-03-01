@@ -4,14 +4,6 @@ var RSS = require('rss');
 
 var createFeed = function createFeed (html, feed_param, params) {
 
-    //Rss maker feed arguments
-//    var params = {
-//        argument_items_section: '#ajax-filtered-section',
-//        argument_item: 'article',
-//        argument_item_title: 'h3',
-//        argument_item_description: 'p'
-//    };
-
     //Utilize cheerio to get jquery functionality
     var $ = cheerio.load(html);
     //Create the new feed
@@ -22,16 +14,20 @@ var createFeed = function createFeed (html, feed_param, params) {
             var title,
                 url,
                 description;
-                title = $(this).find(params.argument_item_title).text();
-                url = $(this).find('a').attr('href');
-                description = $(this).find(params.argument_item_description).text();
+            title = $(this).find(params.argument_item_title).text();
+            url = $(this).find('a').attr('href');
+            //Change relative links into absolute if needed
+            if (url.indexOf('//') == -1) {
+                url = feed_param.site_url + url;
+            }
+            description = $(this).find(params.argument_item_description).text();
+            console.log(title, url);
             feed.item({
                 title: title,
                 url: url,
                 //new Date(),
                 description: description
             });
-
         });
     });
     var xmlString = feed.xml();
