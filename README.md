@@ -1,3 +1,4 @@
-The OpenShift `nodejs` cartridge documentation can be found at:
+#remora
+> A node.js application to generate unofficial rss feed for websites that do not have one.
 
-http://openshift.github.io/documentation/oo_cartridge_guide.html#nodejs
+
