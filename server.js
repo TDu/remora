@@ -27,6 +27,19 @@ var SampleApp = function() {
 
     // Feed parameters to synch
     self.feed_param = {};
+    self.feed_param['aintthatswell'] = {
+        rssmaker: {
+            argument_items_section: 'section',
+            argument_item: '.audible',
+            argument_item_title: 'a',
+            argument_item_description: ''
+        },
+        rssfeed: {
+            title: 'aintthatswell unofficial feed',
+            site_url: 'https://soundcloud.com/aintthatswell'//,
+            //image_url: ''
+        }
+    };
     self.feed_param['beachgrit'] = {
         rssmaker: {
             argument_items_section: '#ajax-filtered-section',
@@ -120,6 +133,9 @@ var SampleApp = function() {
         self.routes['/rss/wsl'] = function(req, res) {
             res.send(self.cache_get('wsl'));
         };
+        self.routes['/rss/aintthatswell'] = function(req, res) {
+            res.send(self.cache_get('aintthatswell'));
+        };
 
         self.routes['/'] = function(req, res) {
             res.setHeader('Content-Type', 'text/html');
@@ -143,11 +159,17 @@ var SampleApp = function() {
     };
 
     self.loadFeed = function () {
-        console.log('beep');
         for (var feedname in self.feed_param) {
             (function (feedname){
-                console.log('loading ' + feedname)
-                request(self.feed_param[feedname].rssfeed.site_url, function(error, response, html){
+                console.log('loading ' + feedname);
+                var options = {
+                    url: self.feed_param[feedname].rssfeed.site_url,
+                    headers: {
+                        'User-Agent': 'request'
+                    }
+                };
+
+                request(options, function(error, response, html){
                     if(!error) {
                         result = rss(html, self.feed_param[feedname].rssfeed, self.feed_param[feedname].rssmaker);
                         self.cache_set(feedname, result);
@@ -159,7 +181,6 @@ var SampleApp = function() {
             })(feedname);
         };
     }
-
 
     /**
      *  Initializes the sample application.
