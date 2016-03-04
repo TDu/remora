@@ -3,7 +3,7 @@
 var express = require('express');
 var request = require('request');
 var rss = require('./rssmaker');
-var fs      = require('fs');
+var fs = require('fs');
 
 var SampleApp = function() {
 
@@ -22,12 +22,12 @@ var SampleApp = function() {
             //  allows us to run/test the app locally.
             console.warn('No OPENSHIFT_NODEJS_IP var, using 127.0.0.1');
             self.ipaddress = "127.0.0.1";
-        };
+        }
     };
 
     // Feed parameters to synch
     self.feed_param = {};
-    self.feed_param['aintthatswell'] = {
+    self.feed_param.aintthatswell = {
         rssmaker: {
             argument_items_section: 'section',
             argument_item: '.audible',
@@ -40,7 +40,7 @@ var SampleApp = function() {
             //image_url: ''
         }
     };
-    self.feed_param['beachgrit'] = {
+    self.feed_param.beachgrit = {
         rssmaker: {
             argument_items_section: '#ajax-filtered-section',
             argument_item: 'article',
@@ -53,7 +53,7 @@ var SampleApp = function() {
             image_url: 'http://beachgrit.com/wp-content/uploads/2015/06/favicon.png'
         }
     };
-    self.feed_param['wsl'] = {
+    self.feed_param.wsl = {
         rssmaker: {
             argument_items_section: '.hub-layout',
             argument_item: '.content-item',
@@ -83,7 +83,7 @@ var SampleApp = function() {
 
     self.cache_set = function(key, value) {
         self.zcache[key] = value;
-    }
+    };
 
     /**
      *  terminator === the termination handler
@@ -159,6 +159,7 @@ var SampleApp = function() {
     };
 
     self.loadFeed = function () {
+        /*jshint loopfunc: true */
         for (var feedname in self.feed_param) {
             (function (feedname){
                 console.log('loading ' + feedname);
@@ -179,8 +180,8 @@ var SampleApp = function() {
             });
             
             })(feedname);
-        };
-    }
+        }
+    };
 
     /**
      *  Initializes the sample application.
