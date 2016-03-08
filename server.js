@@ -1,5 +1,8 @@
 #!/bin/env node
-//
+//Generate unofficial rss feed and start a express server to serve them 
+//The web server staff was officialy based on the OpenShift template.
+//Because that is where I want it to run.
+
 var express = require('express');
 var request = require('request');
 var rss = require('./rssmaker');
@@ -25,8 +28,9 @@ var SampleApp = function() {
         }
     };
 
-    // Feed parameters to synch
+    //Declaration of rss feeds to make
     self.feed_param = {};
+    // Feed from soundcloud
     self.feed_param.aintthatswell = {
         rssmaker: {
             argument_items_section: 'section',
@@ -36,10 +40,11 @@ var SampleApp = function() {
         },
         rssfeed: {
             title: 'aintthatswell unofficial feed',
-            site_url: 'https://soundcloud.com/aintthatswell'//,
+            site_url: 'https://soundcloud.com/aintthatswell',
             //image_url: ''
         }
     };
+    // Feed from beachgrit
     self.feed_param.beachgrit = {
         rssmaker: {
             argument_items_section: '#ajax-filtered-section',
@@ -53,6 +58,7 @@ var SampleApp = function() {
             image_url: 'http://beachgrit.com/wp-content/uploads/2015/06/favicon.png'
         }
     };
+    // Feed from World Surf League
     self.feed_param.wsl = {
         rssmaker: {
             argument_items_section: '.hub-layout',
@@ -63,7 +69,6 @@ var SampleApp = function() {
         rssfeed: {
             title: 'World surf league unofficial feed',
             site_url: 'http://www.worldsurfleague.com',
-            //image_url: 'http://beachgrit.com/wp-content/uploads/2015/06/favicon.png'
         }
     };
 
@@ -99,14 +104,10 @@ var SampleApp = function() {
         console.log('%s: Node server stopped.', Date(Date.now()) );
     };
 
-
-    /**
-     *  Setup termination handlers (for exit and a list of signals).
-     */
+    // Setup termination handlers (for exit and a list of signals).
     self.setupTerminationHandlers = function(){
         //  Process on exit and signals.
         process.on('exit', function() { self.terminator(); });
-
         // Removed 'SIGPIPE' from the list - bugz 852598.
         ['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGILL', 'SIGTRAP', 'SIGABRT',
          'SIGBUS', 'SIGFPE', 'SIGUSR1', 'SIGSEGV', 'SIGUSR2', 'SIGTERM'
@@ -115,54 +116,39 @@ var SampleApp = function() {
         });
     };
 
-
-    /*  ================================================================  */
-    /*  App server functions (main app logic here).                       */
-    /*  ================================================================  */
-
-    /**
-     *  Create the routing table entries + handlers for the application.
-     */
+    // Create the routing table entries + handlers for the application.
     self.createRoutes = function() {
         self.routes = { };
-
         self.routes['/rss/beachgrit'] = function(req, res) {
             res.send(self.cache_get('beachgrit'));
         };
-
         self.routes['/rss/wsl'] = function(req, res) {
             res.send(self.cache_get('wsl'));
         };
         self.routes['/rss/aintthatswell'] = function(req, res) {
             res.send(self.cache_get('aintthatswell'));
         };
-
         self.routes['/'] = function(req, res) {
             res.setHeader('Content-Type', 'text/html');
             res.send(self.cache_get('index.html') );
         };
     };
 
-
-    /**
-     *  Initialize the server (express) and create the routes and register
-     *  the handlers.
-     */
+    // Initialize the server (express) and create the routes and register the handlers.
     self.initializeServer = function() {
         self.createRoutes();
         self.app = express();
-
         //  Add handlers for the app (from the routes).
         for (var r in self.routes) {
             self.app.get(r, self.routes[r]);
         }
     };
 
+    //Generate feeds and stach them in the cache
     self.loadFeed = function () {
         /*jshint loopfunc: true */
         for (var feedname in self.feed_param) {
             (function (feedname){
-                console.log('loading ' + feedname);
                 var options = {
                     url: self.feed_param[feedname].rssfeed.site_url,
                     headers: {
@@ -172,50 +158,39 @@ var SampleApp = function() {
 
                 request(options, function(error, response, html){
                     if(!error) {
-                        result = rss(html, self.feed_param[feedname].rssfeed, self.feed_param[feedname].rssmaker);
+                        result = rss(html,
+                                self.feed_param[feedname].rssfeed,
+                                self.feed_param[feedname].rssmaker);
                         self.cache_set(feedname, result);
                     } else {
-                        self.cache_set('feedname', 'Ooops something went wrong : ' + error);
+                        self.cache_set('feedname', ' something went wrong : ' + error);
                     }
-            });
-            
+                });
             })(feedname);
         }
     };
 
-    /**
-     *  Initializes the sample application.
-     */
+    // Initializes the sample application.
     self.initialize = function() {
         self.setupVariables();
         self.populateCache();
+        self.loadFeed();
         self.setupTerminationHandlers();
-
         // Create the express server and routes.
         self.initializeServer();
     };
 
-
-    /**
-     *  Start the server (starts up the sample application).
-     */
+    // Start the server (starts up the sample application).
     self.start = function() {
         //  Start the app on the specific interface (and port).
-        self.loadFeed();
         setInterval(self.loadFeed, 600000);
         self.app.listen(self.port, self.ipaddress, function() {
             console.log('%s: Node server started on %s:%d ...',
                         Date(Date.now() ), self.ipaddress, self.port);
         });
     };
+};
 
-};   /*  Sample Application.  */
-
-
-
-/**
- *  main():  Main code.
- */
 var zapp = new SampleApp();
 zapp.initialize();
 zapp.start();
