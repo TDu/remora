@@ -30,6 +30,8 @@ var SampleApp = function() {
 
     //Declaration of rss feeds to make
     self.feed_param = {};
+    //List of feeds automatically generated
+    self.feed_list = {};
     // Feed from soundcloud
     self.feed_param.aintthatswell = {
         rssmaker: {
@@ -132,6 +134,10 @@ var SampleApp = function() {
             res.setHeader('Content-Type', 'text/html');
             res.send(self.cache_get('index.html') );
         };
+        self.routes['/feedlist'] = function(req, res) {
+            res.setHeader('Content-Type', 'text/json');
+            res.send(JSON.stringify(self.feed_list));
+        }
     };
 
     // Initialize the server (express) and create the routes and register the handlers.
@@ -149,6 +155,7 @@ var SampleApp = function() {
         /*jshint loopfunc: true */
         for (var feedname in self.feed_param) {
             (function (feedname){
+                self.feed_list[feedname] = "rss/" + feedname
                 var options = {
                     url: self.feed_param[feedname].rssfeed.site_url,
                     headers: {
@@ -188,6 +195,7 @@ var SampleApp = function() {
             console.log('%s: Node server started on %s:%d ...',
                         Date(Date.now() ), self.ipaddress, self.port);
         });
+        self.app.use(express.static('static'));
     };
 };
 
