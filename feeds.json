@@ -1,0 +1,29 @@
+[
+{
+    "name": "aintthatswell",
+    "rssmaker": {
+        "argument_items_section": "section",
+        "argument_item": ".audible",
+        "argument_item_title": "a",
+        "argument_item_description": ""
+    },
+    "rssfeed": {
+        "title": "aintthatswell unofficial feed",
+        "site_url": "https://soundcloud.com/aintthatswell"
+    }
+},
+{
+    "name": "beachgrit",
+    "rssmaker": {
+        "argument_items_section": "#ajax-filtered-section",
+        "argument_item": "article",
+        "argument_item_title": "h3",
+        "argument_item_descrption": "p"
+    },
+    "rssfeed": {
+        "title": "Beachgrit unofficial feed",
+        "site_url": "http://www.beachgrit.com",
+        "image_url": "http://beachgrit.com/wp-content/uploads/2015/06/favicon.png"
+    }
+}
+]

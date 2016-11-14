@@ -7,6 +7,7 @@ var express = require('express');
 var request = require('request');
 var rss = require('./rssmaker');
 var fs = require('fs');
+var feedsToCreate = require('./feeds.json');
 
 var SampleApp = function() {
 
@@ -28,58 +29,16 @@ var SampleApp = function() {
         }
     };
 
-    //Declaration of rss feeds to make
-    self.feed_param = {};
     //List of feeds automatically generated
     self.feed_list = {};
-    // Feed from soundcloud
-    self.feed_param.aintthatswell = {
-        rssmaker: {
-            argument_items_section: 'section',
-            argument_item: '.audible',
-            argument_item_title: 'a',
-            argument_item_description: ''
-        },
-        rssfeed: {
-            title: 'aintthatswell unofficial feed',
-            site_url: 'https://soundcloud.com/aintthatswell',
-            //image_url: ''
-        }
-    };
-    // Feed from beachgrit
-    self.feed_param.beachgrit = {
-        rssmaker: {
-            argument_items_section: '#ajax-filtered-section',
-            argument_item: 'article',
-            argument_item_title: 'h3',
-            argument_item_description: 'p'
-        },
-        rssfeed: {
-            title: 'Beachgrit unofficial feed',
-            site_url: 'http://www.beachgrit.com',
-            image_url: 'http://beachgrit.com/wp-content/uploads/2015/06/favicon.png'
-        }
-    };
-    // Feed from World Surf League
-    self.feed_param.wsl = {
-        rssmaker: {
-            argument_items_section: '.hub-layout',
-            argument_item: '.content-item',
-            argument_item_title: '.content-item-title',
-            argument_item_description: '.content-item-description'
-        },
-        rssfeed: {
-            title: 'World surf league unofficial feed',
-            site_url: 'http://www.worldsurfleague.com',
-        }
-    };
 
     // Populate the cache.
     self.populateCache = function() {
+        // Create the cache object
         if (typeof self.zcache === "undefined") {
-            self.zcache = { 'index.html': '' };
+            self.zcache = {};
         }
-        //  Local cache for static content.
+        // Initialize cache for static content.
         self.zcache['index.html'] = fs.readFileSync('./index.html');
     };
 
@@ -121,6 +80,11 @@ var SampleApp = function() {
     // Create the routing table entries + handlers for the application.
     self.createRoutes = function() {
         self.routes = { };
+
+        self.routes['/test'] = function(req, res) {
+            res.send(self.zcache);
+        };
+
         self.routes['/rss/beachgrit'] = function(req, res) {
             res.send(self.cache_get('beachgrit'));
         };
@@ -150,30 +114,33 @@ var SampleApp = function() {
         }
     };
 
-    //Generate feeds and stach them in the cache
-    self.loadFeed = function () {
-        /*jshint loopfunc: true */
-        for (var feedname in self.feed_param) {
-            (function (feedname){
-                self.feed_list[feedname] = "rss/" + feedname
+    // Generates the rss feeds whose description is passed in parameter
+    self.makeFeed = function(feeds) {
+        var feedname;
+
+        for ( var i=0; i < feeds.length; i++) {
+            feedname = feeds[i].name;
+            self.feed_list[feedname] = "rss/" + feedname;
+
+            (function (feed) {
                 var options = {
-                    url: self.feed_param[feedname].rssfeed.site_url,
-                    headers: {
-                        'User-Agent': 'request'
-                    }
-                };
+                        url: feed.rssfeed.site_url,
+                        headers: {
+                            'User-Agent': 'request'
+                        }
+                    };
 
                 request(options, function(error, response, html){
                     if(!error) {
-                        result = rss(html,
-                                self.feed_param[feedname].rssfeed,
-                                self.feed_param[feedname].rssmaker);
-                        self.cache_set(feedname, result);
+                        console.log('Feed generated : ' + feed.name);
+                        var result = rss( html, feed.rssfeed, feed.rssmaker);
+                        self.cache_set(feed.name, result);
                     } else {
-                        self.cache_set('feedname', ' something went wrong : ' + error);
+                        console.log('Error generating feed for ' + feed.name);
+                        self.cache_set(feed.name, ' something went wrong : ' + error);
                     }
                 });
-            })(feedname);
+            })(feeds[i])
         }
     };
 
@@ -181,7 +148,9 @@ var SampleApp = function() {
     self.initialize = function() {
         self.setupVariables();
         self.populateCache();
-        self.loadFeed();
+
+        setInterval(self.makeFeed(feedsToCreate), 600000);
+
         self.setupTerminationHandlers();
         // Create the express server and routes.
         self.initializeServer();
@@ -190,7 +159,6 @@ var SampleApp = function() {
     // Start the server (starts up the sample application).
     self.start = function() {
         //  Start the app on the specific interface (and port).
-        setInterval(self.loadFeed, 600000);
         self.app.listen(self.port, self.ipaddress, function() {
             console.log('%s: Node server started on %s:%d ...',
                         Date(Date.now() ), self.ipaddress, self.port);
