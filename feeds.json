@@ -8,8 +8,21 @@
         "argument_item_description": ""
     },
     "rssfeed": {
-        "title": "aintthatswell unofficial feed",
+        "title": "aintthatswell on soundcloud",
         "site_url": "https://soundcloud.com/aintthatswell"
+    }
+},
+{
+    "name": "occ-cast",
+    "rssmaker": {
+        "argument_items_section": "section",
+        "argument_item": ".audible",
+        "argument_item_title": "a",
+        "argument_item_description": ""
+    },
+    "rssfeed": {
+        "title": "occ-cast on soundcloud",
+        "site_url": "https://soundcloud.com/occ-cast"
     }
 },
 {
@@ -25,5 +38,20 @@
         "site_url": "http://www.beachgrit.com",
         "image_url": "http://beachgrit.com/wp-content/uploads/2015/06/favicon.png"
     }
+},
+{
+    "name": "AlanRoura",
+    "rssmaker": {
+        "argument_items_section": ".blog",
+        "argument_item": "article",
+        "argument_item_title": "h2",
+        "argument_item_descrption": ".art-article"
+    },
+    "rssfeed": {
+        "title": "Alan Roura",
+        "site_url": "http://alanroura.com/index.php/les-actualites/breves",
+        "image_url": ""
+    }
 }
+
 ]
