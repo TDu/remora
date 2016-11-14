@@ -82,19 +82,24 @@ var SampleApp = function() {
     // Create the routing table entries + handlers for the application.
     self.createRoutes = function() {
 
-        self.routes['/test'] = function(req, res) {
+        // To check the cache, this is for debug
+        /*
+        /self.routes['/cache'] = function(req, res) {
             console.log(req.url);
             res.send(self.zcache);
         };
+        */
 
+        // The route to get one of the feed generated 
         self.routes['/rss/:feedname'] = function(req, res) {
             res.send(self.cache_get(req.params.feedname));
         };
-
+        // Main route
         self.routes['/'] = function(req, res) {
             res.setHeader('Content-Type', 'text/html');
             res.send(self.cache_get('index.html') );
         };
+        //Return the feed list, called by the main page in ajax
         self.routes['/feedlist'] = function(req, res) {
             res.setHeader('Content-Type', 'text/json');
             res.send(JSON.stringify(self.feed_list));
