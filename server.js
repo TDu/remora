@@ -32,6 +32,8 @@ var SampleApp = function() {
     //List of feeds automatically generated
     self.feed_list = {};
 
+    self.routes = { };
+
     // Populate the cache.
     self.populateCache = function() {
         // Create the cache object
@@ -79,21 +81,16 @@ var SampleApp = function() {
 
     // Create the routing table entries + handlers for the application.
     self.createRoutes = function() {
-        self.routes = { };
 
         self.routes['/test'] = function(req, res) {
+            console.log(req.url);
             res.send(self.zcache);
         };
 
-        self.routes['/rss/beachgrit'] = function(req, res) {
-            res.send(self.cache_get('beachgrit'));
+        self.routes['/rss/:feedname'] = function(req, res) {
+            res.send(self.cache_get(req.params.feedname));
         };
-        self.routes['/rss/wsl'] = function(req, res) {
-            res.send(self.cache_get('wsl'));
-        };
-        self.routes['/rss/aintthatswell'] = function(req, res) {
-            res.send(self.cache_get('aintthatswell'));
-        };
+
         self.routes['/'] = function(req, res) {
             res.setHeader('Content-Type', 'text/html');
             res.send(self.cache_get('index.html') );
@@ -114,7 +111,7 @@ var SampleApp = function() {
         }
     };
 
-    // Generates the rss feeds whose description is passed in parameter
+    // Generates the rss feeds whose description is passed in parameter and stach them in the cache
     self.makeFeed = function(feeds) {
         var feedname;
 
@@ -149,7 +146,8 @@ var SampleApp = function() {
         self.setupVariables();
         self.populateCache();
 
-        setInterval(self.makeFeed(feedsToCreate), 600000);
+        self.makeFeed(feedsToCreate);
+        //setInterval(self.makeFeed(feedsToCreate), 600000);
 
         self.setupTerminationHandlers();
         // Create the express server and routes.
