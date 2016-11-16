@@ -41,10 +41,10 @@ var makeFeed = function(feeds) {
                 if(!error) {
                     console.log('Feed generated : ' + feed.name);
                     var result = rss( html, feed.rssfeed, feed.rssmaker);
-                    zCacheSet(feed.name, result);
+                    zcacheSet(feed.name, result);
                 } else {
                     console.log('Error generating feed for ' + feed.name);
-                    zCacheSet(feed.name, ' something went wrong : ' + error);
+                    zcacheSet(feed.name, ' something went wrong : ' + error);
                 }
             });
         })(feeds[i])
@@ -71,10 +71,9 @@ var setupTerminationHandlers = function(){
 };
 
 app.setFeed = function (feedsDetail) {
-    makeFeed(feedsDetail);
+    setInterval(makeFeed(feedsDetail), 600000);
 }
 
-setInterval(self.makeFeed(feedsToCreate), 600000);
 
 // The route to get one of the feed generated 
 app.get('/rss/:feedname', function(req, res) {

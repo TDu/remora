@@ -40,7 +40,7 @@
     }
 },
 {
-    "name": "AlanRoura",
+    "name": "AlanRouraBreves",
     "rssmaker": {
         "argument_items_section": ".blog",
         "argument_item": "article",
@@ -48,8 +48,22 @@
         "argument_item_descrption": ".art-article"
     },
     "rssfeed": {
-        "title": "Alan Roura",
+        "title": "Alan Roura - brèves",
         "site_url": "http://alanroura.com/index.php/les-actualites/breves",
+        "image_url": ""
+    }
+},
+{
+    "name": "AlanRouraArticles",
+    "rssmaker": {
+        "argument_items_section": ".blog",
+        "argument_item": ".art-post",
+        "argument_item_title": "h2",
+        "argument_item_descrption": ".s1"
+    },
+    "rssfeed": {
+        "title": "Alan Roura - articles",
+        "site_url": "http://alanroura.com/index.php/les-actualites/articles1",
         "image_url": ""
     }
 }
