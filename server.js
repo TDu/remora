@@ -13,10 +13,12 @@ var feedLoadInterval = 600000;  //10 minutes
 var feedList = {};              //List of feeds generated with their url in the app
 var zcache = {};                //The cache use by the app
 
-// Initialize the cache for the app
+// Initialize the cache used by the app for the feeds data and pages
 zcache['index.html'] = fs.readFileSync('./index.html');
 // Function to get and set the cache
-var zcacheGet = function(key) { return zcache[key]; };
+var zcacheGet = function(key) {
+    return zcache[key];
+};
 var zcacheSet = function(key, value) {
     zcache[key] = value;
 };
@@ -70,8 +72,9 @@ var setupTerminationHandlers = function(){
     });
 };
 
+// To pass the feeds description to the server
 app.setFeed = function (feedsDetail) {
-    setInterval(makeFeed(feedsDetail), 600000);
+    setInterval(makeFeed(feedsDetail), feedLoadInterval);
 }
 
 
